@@ -12,6 +12,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String deleteId = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 36, color: Colors.blue)),
               alignment: Alignment.centerLeft,
             )),
-        Expanded(child: memoBuilder())
+        Expanded(child: memoBuilder(context))
       ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -61,7 +62,43 @@ class _MyHomePageState extends State<MyHomePage> {
     return await sd.memos();
   }
 
-  Widget memoBuilder() {
+  Future<void> deleteMemo(String id) async  {
+    DBHelper sd = DBHelper();
+    return await sd.deleteMemo(id);
+  }
+
+  void showAlertDialog(BuildContext context) async {
+    String result = await showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('삭제 경고창'),
+          content: Text("메모를 정말 삭제하겠습니까?"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('삭제'),
+              onPressed: () {
+                Navigator.pop(context, "삭제");
+                setState(() {
+                  deleteMemo(deleteId);
+                });
+                deleteId = '';
+              },
+            ),
+            FlatButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.pop(context, "취소");
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget memoBuilder(BuildContext parentContext) {
     return FutureBuilder(
       builder: (context, Snap) {
         if (Snap.data.isEmpty) {
@@ -80,43 +117,52 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: Snap.data.length,
           itemBuilder: (context, index) {
             Memo memo = Snap.data[index];
-            return Container(
-              margin: EdgeInsets.all(5),
-              padding: EdgeInsets.all(10),
-              alignment: Alignment.center,
-              height: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                    Text(memo.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
-                    Text(memo.text, style: TextStyle(fontSize: 15)),
-                  ],),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Text("최종 수정 시간: "+memo.editTime.split('.')[0],
-                      style: TextStyle(fontSize: 11),
-                      textAlign: TextAlign.end,)
-                    ],
-                  )
-                ],
-              ),
 
-                decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: Colors.blue,
-                width: 1,
-              ),
-              boxShadow: [BoxShadow(color: Colors.blue, blurRadius: 3)],
-              borderRadius: BorderRadius.circular(12),
-            ));
+            return InkWell(
+              onTap: (){},
+              onLongPress: (){
+                deleteId = memo.id;
+                showAlertDialog(parentContext);
+
+              },
+              child: Container(
+                  margin: EdgeInsets.all(5),
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  height: 80,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Text(memo.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
+                          Text(memo.text, style: TextStyle(fontSize: 15)),
+                        ],),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Text("최종 수정 시간: "+memo.editTime.split('.')[0],
+                            style: TextStyle(fontSize: 11),
+                            textAlign: TextAlign.end,)
+                        ],
+                      )
+                    ],
+                  ),
+
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(230,230,230,1),
+                    border: Border.all(
+                      color: Colors.blue,
+                      width: 1,
+                    ),
+                    boxShadow: [BoxShadow(color: Colors.blue, blurRadius: 3)],
+                    borderRadius: BorderRadius.circular(12),
+                  )),
+            );
           },
         );
       },
