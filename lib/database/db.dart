@@ -44,7 +44,7 @@ class DBHelper {
     final db = await database;
 
     //모든 Memo를 얻기 위해 테이블에 질의합니다.
-    final List<Map<String,dynamic>> maps = await db.query('memos');
+    final List<Map<String,dynamic>> maps = await db.query('memos', orderBy: "editTime desc", );
 
     //List<Map<String, dynamic>를 List<Memo>로 변환합니다.
     return List.generate(maps.length, (i){
