@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget memoBuilder(BuildContext parentContext) {
     return FutureBuilder(
       builder: (context, snap) {
-        if (snap.data == null || snap.data == []) {
+        if (snap.data == null || snap.data.toString() == "[]") {
           return Container(
             alignment: Alignment.center,
             child: Text(
@@ -96,7 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: snap.data.length,
           itemBuilder: (context, index) {
             Memo memo = snap.data[index];
-
             return InkWell(
               onTap: () {
                 Navigator.push(
