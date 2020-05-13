@@ -64,7 +64,7 @@ class DBHelper {
     //주어진 Memo를 수정합니다.
     await db.update(TableName, memo.toMap(),
     //Memo의 id가 일치하는지 확인합니다.
-      where: "id : ?",
+      where: "id = ?",
       //Memo의 id를 whereArg로 넘겨 SQL injection을 방지합니다.
       whereArgs: [memo.id],
     );
@@ -77,6 +77,24 @@ class DBHelper {
     await db.delete(TableName,
     where: 'id = ?',
     whereArgs: [id]);
+  }
+
+  Future<List<Memo>> findMemo(String id) async {
+    final db = await database;
+
+    //모든 Memo를 얻기 위해 테이블에 질의합니다.
+    final List<Map<String,dynamic>> maps = await db.query('memos', where: 'id = ?', whereArgs: [id]);
+
+    //List<Map<String, dynamic>를 List<Memo>로 변환합니다.
+    return List.generate(maps.length, (i){
+      return Memo(
+          id: maps[i]['id'],
+          title: maps[i]['title'],
+          text: maps[i]['text'],
+          createTime: maps[i]['createTime'],
+          editTime: maps[i]['editTime']
+      );
+    });
   }
 
 }
