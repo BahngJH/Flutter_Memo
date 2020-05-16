@@ -4,6 +4,7 @@ import 'write.dart';
 import 'package:memomemo/database/memo.dart';
 import 'package:memomemo/database/db.dart';
 import 'view.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -18,32 +19,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    int columnCount = 3;
     return Scaffold(
       //데이터를 리스트로 뿌려줄 때 유용한 위젯
       body: Column(children: <Widget>[
+        //메모앱 상단
         Padding(
-            padding: EdgeInsets.only(left: 20, top: 40, bottom: 20),
+            padding: EdgeInsets.only(left: 20, top: 40),
             child: Container(
               child: Text('메모메모',
                   style: TextStyle(fontSize: 36, color: Colors.blue)),
               alignment: Alignment.centerLeft,
             )),
+
+        //메모앱 리스트
         Expanded(child: memoBuilder(context))
       ]),
 
       floatingActionButton:
           insertMemoButton(), // This trailing comma makes auto-formatting nicer for build methods.
     );
-  }
-
-  Future<List<Memo>> loadMemo() async {
-    DBHelper sd = DBHelper();
-    return await sd.memos();
-  }
-
-  Future<void> deleteMemo(String id) async {
-    DBHelper sd = DBHelper();
-    return await sd.deleteMemo(id);
   }
 
   void showAlertDialog(BuildContext context) async {
@@ -90,79 +85,74 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         }
+
         return ListView.builder(
           physics: BouncingScrollPhysics(),
           padding: EdgeInsets.all(20),
           itemCount: snap.data.length,
           itemBuilder: (context, index) {
             Memo memo = snap.data[index];
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                    parentContext,
-                    CupertinoPageRoute(
-                        builder: (context) => ViewPage(id: memo.id)));
-              },
-              onLongPress: () {
-                deleteId = memo.id;
-                showAlertDialog(parentContext);
-              },
-              child: Container(
-                  margin: EdgeInsets.all(5),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.center,
+
+            String memoTime = TimeCheckAmPm(memo.editTime);
+
+            return Column(
+              children: <Widget>[
+                Container(
                   height: 80,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
-                            memo.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            memo.text,
-                            style: TextStyle(fontSize: 15),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                  child: Card(
+                    child: ListTile(
+                      trailing: Text(
+                        memoTime,
+                        style: TextStyle(fontSize: 11),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
-                            "최종 수정 시간: " + memo.editTime.split('.')[0],
-                            style: TextStyle(fontSize: 11),
-                            textAlign: TextAlign.end,
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(230, 230, 230, 1),
-                    border: Border.all(
-                      color: Colors.blue,
-                      width: 1,
+                      title: Text(
+                        memo.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                          memo.text,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
+                      onTap: () => Navigator.push(
+                          parentContext,
+                          CupertinoPageRoute(
+                              builder: (context) => ViewPage(id: memo.id))),
+                      onLongPress: () {
+                        deleteId = memo.id;
+                        showAlertDialog(parentContext);
+                      },
                     ),
-                    boxShadow: [BoxShadow(color: Colors.blue, blurRadius: 3)],
-                    borderRadius: BorderRadius.circular(12),
-                  )),
+                  ),
+                )
+              ],
             );
           },
         );
       },
       future: loadMemo(),
     );
+  }
+
+  String TimeCheckAmPm (String editTime) {
+    int parseTime = int.parse(editTime.substring(11,13));
+
+    parseTime = parseTime > 12 ? parseTime -12 : parseTime;
+    String amPm = parseTime > 12 ? "오후 ":"오전 ";
+    editTime = editTime.substring(0, 16).replaceAll("-", "/");
+
+    return editTime.substring(0,11)
+        + "\n" + amPm + parseTime.toString() +":"+ editTime.substring(14);
+  }
+
+  Future<List<Memo>> loadMemo() async {
+    DBHelper sd = DBHelper();
+    return await sd.memos();
+  }
+
+  Future<void> deleteMemo(String id) async {
+    DBHelper sd = DBHelper();
+    return await sd.deleteMemo(id);
   }
 }
 

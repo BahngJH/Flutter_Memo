@@ -30,7 +30,11 @@ class _EditPageState extends State<EditPage> {
             )
           ],
         ),
-        body: Padding(padding: EdgeInsets.all(20), child: loadBuilder()));
+        body: Padding(
+            padding: EdgeInsets.all(20),
+            child: loadBuilder()
+        )
+    );
   }
 
   Future<List<Memo>> loadMemo(String id) async {
@@ -42,6 +46,7 @@ class _EditPageState extends State<EditPage> {
     return FutureBuilder<List<Memo>>(
       future: loadMemo(widget.id),
       builder: (BuildContext context, AsyncSnapshot<List<Memo>> snapshot) {
+        print(snapshot);
         if (snapshot.data == null || snapshot.data == []) {
           return Container(child: Text("데이터를 불러올 수 없습니다."));
         } else {
@@ -60,30 +65,36 @@ class _EditPageState extends State<EditPage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              TextField(
-                controller: tecTitle,
-                maxLines: 2,
-                onChanged: (String title) {
-                  this.title = title;
-                },
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-                //obscureText: true,
-                decoration: InputDecoration(
-                  //border: OutlineInputBorder(),
-                  hintText: '메모의 제목을 적어주세요.',
+              Flexible(
+                child: TextField(
+                  controller: tecTitle,
+                  maxLines: 1,
+                  onChanged: (String title) {
+                    this.title = title;
+                  },
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                  //obscureText: true,
+                  decoration: InputDecoration(
+                    //border: OutlineInputBorder(),
+                    labelText: '메모 제목',
+                  ),
                 ),
               ),
               Padding(padding: EdgeInsets.all(10)),
-              TextField(
-                controller: tecText,
-                maxLines: 8,
-                onChanged: (String text) {
-                  this.text = text;
-                },
-                //obscureText: true,
-                decoration: InputDecoration(
-                  //border: OutlineInputBorder(),
-                  hintText: '메모의 내용을 적어주세요.',
+              Flexible(
+                child: TextField(
+                  keyboardType: TextInputType.multiline,
+                  controller: tecText,
+                  maxLines: null,
+                  onChanged: (String text) {
+                    this.text = text;
+                  },
+                  //obscureText: true,
+                  decoration: InputDecoration(
+                    //border: OutlineInputBorder(),
+                    labelText: '메모 내용을 적어주세요.',
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
             ],
@@ -97,7 +108,8 @@ class _EditPageState extends State<EditPage> {
     DBHelper sd = DBHelper();
 
     var fido = Memo(
-      id: widget.id, // String
+      id: widget.id,
+      // String
       title: this.title,
       text: this.text,
       createTime: this.createTime,

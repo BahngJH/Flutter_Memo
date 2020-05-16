@@ -26,7 +26,6 @@ class WritePage extends StatelessWidget {
                 saveDB();
                 resMsg = "메모저장!";
               }
-
               Navigator.pop(context, resMsg);
             },
           )
@@ -36,23 +35,32 @@ class WritePage extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Column(
           children: <Widget>[
-            TextField(
-              onChanged: (String title) {
-                this.title = title;
-              },
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-              keyboardType: TextInputType.multiline,
-              maxLines: 2,
-              decoration: InputDecoration(hintText: '제목을 적어주세요'),
+            Flexible(
+              child: TextField(
+                onChanged: (String title) {
+                  this.title = title;
+                },
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                keyboardType: TextInputType.multiline,
+                maxLines: 1,
+                decoration: InputDecoration(
+                  labelText: '제목을 적어주세요',
+                ),
+              ),
             ),
             Padding(padding: EdgeInsets.all(10)),
-            TextField(
-              onChanged: (String text) {
-                this.text = text;
-              },
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(hintText: '내용을 적어주세요'),
+            Flexible(
+              child: TextField(
+                onChanged: (String text) {
+                  this.text = text;
+                },
+                //keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                    labelText: '내용을 적어주세요',
+                    border: InputBorder.none,
+                ),
+              ),
             ),
           ],
         ),
@@ -82,31 +90,5 @@ class WritePage extends StatelessWidget {
 
     return digest.toString();
   }
-
-  noTextSnackBar2(BuildContext context) {
-    final snackBar = SnackBar(
-      content: Text("나는 스낵바"),
-    );
-    Scaffold.of(_context).showSnackBar(snackBar);
-  }
 }
 
-class noTextSnackBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: snackk(context));
-  }
-
-  Widget snackk(BuildContext context) {
-    final snackBar = SnackBar(
-      content: Text("asdasd"),
-      action: SnackBarAction(
-        label: 'Undo',
-        onPressed: () {
-          //Some code to undo the change
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
-}

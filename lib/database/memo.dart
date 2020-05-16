@@ -3,7 +3,7 @@ class Memo{
   final String title;
   final String text;
   final String createTime;
-  final String editTime;
+  String editTime;
 
   Memo({this.id, this.title, this.text, this.createTime, this.editTime});
 
