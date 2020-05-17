@@ -20,20 +20,22 @@ class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
     _context = context;
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: updateDB,
-            )
-          ],
-        ),
-        body: Padding(
-            padding: EdgeInsets.all(20),
-            child: loadBuilder()
-        )
+    return MaterialApp(
+      home: Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.save_alt),
+                onPressed: updateDB,
+              )
+            ],
+          ),
+          body: Padding(
+              padding: EdgeInsets.all(20),
+              child: loadBuilder()
+          )
+      ),
     );
   }
 
@@ -67,21 +69,20 @@ class _EditPageState extends State<EditPage> {
             children: <Widget>[
               Flexible(
                 child: TextField(
-                  controller: tecTitle,
                   maxLines: 1,
+                  maxLength: 25,
                   onChanged: (String title) {
                     this.title = title;
                   },
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-                  //obscureText: true,
                   decoration: InputDecoration(
-                    //border: OutlineInputBorder(),
                     labelText: '메모 제목',
                   ),
                 ),
               ),
               Padding(padding: EdgeInsets.all(10)),
               Flexible(
+                flex: 2,
                 child: TextField(
                   keyboardType: TextInputType.multiline,
                   controller: tecText,
@@ -89,9 +90,7 @@ class _EditPageState extends State<EditPage> {
                   onChanged: (String text) {
                     this.text = text;
                   },
-                  //obscureText: true,
                   decoration: InputDecoration(
-                    //border: OutlineInputBorder(),
                     labelText: '메모 내용을 적어주세요.',
                     border: InputBorder.none,
                   ),

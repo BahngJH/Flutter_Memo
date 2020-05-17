@@ -4,7 +4,7 @@ import 'write.dart';
 import 'package:memomemo/database/memo.dart';
 import 'package:memomemo/database/db.dart';
 import 'view.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'utility.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -92,8 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: snap.data.length,
           itemBuilder: (context, index) {
             Memo memo = snap.data[index];
-
-            String memoTime = TimeCheckAmPm(memo.editTime);
+            Utility util = Utility();
 
             return Column(
               children: <Widget>[
@@ -102,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Card(
                     child: ListTile(
                       trailing: Text(
-                        memoTime,
+                        util.TimeCheckAmPm(memo.editTime),
                         style: TextStyle(fontSize: 11),
                       ),
                       title: Text(
@@ -132,17 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       future: loadMemo(),
     );
-  }
-
-  String TimeCheckAmPm (String editTime) {
-    int parseTime = int.parse(editTime.substring(11,13));
-
-    parseTime = parseTime > 12 ? parseTime -12 : parseTime;
-    String amPm = parseTime > 12 ? "오후 ":"오전 ";
-    editTime = editTime.substring(0, 16).replaceAll("-", "/");
-
-    return editTime.substring(0,11)
-        + "\n" + amPm + parseTime.toString() +":"+ editTime.substring(14);
   }
 
   Future<List<Memo>> loadMemo() async {

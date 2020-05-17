@@ -4,6 +4,7 @@ import 'package:memomemo/database/memo.dart';
 import 'package:memomemo/database/db.dart';
 import 'edit.dart';
 import 'package:share/share.dart';
+import 'utility.dart';
 
 class ViewPage extends StatefulWidget {
   ViewPage({Key key, this.id}) : super(key: key);
@@ -93,9 +94,14 @@ class _ViewPageState extends State<ViewPage> {
   }
 
   LoadBuilder() {
+
     return FutureBuilder<List<Memo>>(
         future: loadMemo(widget.id),
         builder: (BuildContext context, AsyncSnapshot<List<Memo>> snapshot) {
+
+          Utility util = Utility();
+
+
           if (snapshot.data == null) {
             return Container(child: Text("데이터를 불러올 수 없습니다."));
           } else {
@@ -114,14 +120,19 @@ class _ViewPageState extends State<ViewPage> {
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(10)),
-                Expanded(child: Text(_memo.text)),
+                
+                //긴글 텍스트 스크롤 생성하게 도와줌
+                Expanded(
+                    flex: 1,
+                    child: SingleChildScrollView(
+                        child: Text(_memo.text))),
                 Text(
-                  "메모 만든 시간 " + _memo.createTime.split('.')[0],
+                  "최근 수정 시간 : " + util.TimeCheckAmPm(_memo.editTime)+"\n",
                   style: TextStyle(fontSize: 11),
                   textAlign: TextAlign.end,
                 ),
                 Text(
-                  "메모 수정 시간 " + _memo.editTime.split('.')[0],
+                  "최초 만든 시간 : " + util.TimeCheckAmPm(_memo.createTime),
                   style: TextStyle(fontSize: 11),
                   textAlign: TextAlign.end,
                 ),
