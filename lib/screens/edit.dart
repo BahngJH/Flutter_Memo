@@ -22,7 +22,7 @@ class _EditPageState extends State<EditPage> {
     _context = context;
     return MaterialApp(
       home: Scaffold(
-          resizeToAvoidBottomInset: false,
+                                  //resizeToAvoidBottomInset: false, -> 이거때매 textField의 위치가 자동으로 안되고 박혀있었음 밑에
           appBar: AppBar(
             actions: <Widget>[
               IconButton(
@@ -37,11 +37,6 @@ class _EditPageState extends State<EditPage> {
           )
       ),
     );
-  }
-
-  Future<List<Memo>> loadMemo(String id) async {
-    DBHelper sd = DBHelper();
-    return await sd.findMemo(id);
   }
 
   loadBuilder() {
@@ -71,6 +66,7 @@ class _EditPageState extends State<EditPage> {
                 child: TextField(
                   maxLines: 1,
                   maxLength: 25,
+                  controller: tecTitle,
                   onChanged: (String title) {
                     this.title = title;
                   },
@@ -91,7 +87,8 @@ class _EditPageState extends State<EditPage> {
                     this.text = text;
                   },
                   decoration: InputDecoration(
-                    labelText: '메모 내용을 적어주세요.',
+
+                    labelText: '메모 내용',
                     border: InputBorder.none,
                   ),
                 ),
@@ -101,6 +98,11 @@ class _EditPageState extends State<EditPage> {
         }
       },
     );
+  }
+
+  Future<List<Memo>> loadMemo(String id) async {
+    DBHelper sd = DBHelper();
+    return await sd.findMemo(id);
   }
 
   void updateDB() {

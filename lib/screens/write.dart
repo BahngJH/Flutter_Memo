@@ -50,7 +50,7 @@ class _WritePage extends State<WritePage> {
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    labelText: '제목을 적어주세요',
+                    labelText: '메모 제목',
                   ),
                 ),
               ),
@@ -61,13 +61,13 @@ class _WritePage extends State<WritePage> {
               Flexible(
                 flex: 2,
                 child: TextField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
                   onChanged: (String text) {
                     this.text = text;
                   },
-                  //keyboardType: TextInputType.multiline,
-                  maxLines: null,
                   decoration: InputDecoration(
-                    labelText: '내용을 적어주세요',
+                    labelText: '메모 내용',
                     border: InputBorder.none,
                   ),
                 ),
