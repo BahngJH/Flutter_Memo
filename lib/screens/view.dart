@@ -20,32 +20,38 @@ class _ViewPageState extends State<ViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () => share(context),
-          ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              deleteMemo(_memo.id);
-              Navigator.pop(context);
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (context) => EditPage(id: widget.id)));
-            },
-          )
-        ],
+    return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
+          brightness: Brightness.dark
       ),
-      body: Padding(padding: EdgeInsets.all(20), child: LoadBuilder()),
+      home: Scaffold(
+        appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () => share(context),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                deleteMemo(_memo.id);
+                Navigator.pop(context);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditPage(id: widget.id)));
+              },
+            )
+          ],
+        ),
+        body: Padding(padding: EdgeInsets.all(20), child: LoadBuilder()),
+      ),
     );
   }
 

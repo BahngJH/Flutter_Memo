@@ -21,6 +21,10 @@ class _EditPageState extends State<EditPage> {
   Widget build(BuildContext context) {
     _context = context;
     return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
+          brightness: Brightness.dark
+      ),
       home: Scaffold(
                                   //resizeToAvoidBottomInset: false, -> 이거때매 textField의 위치가 자동으로 안되고 박혀있었음 밑에
           appBar: AppBar(

@@ -19,25 +19,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int columnCount = 3;
-    return Scaffold(
-      //데이터를 리스트로 뿌려줄 때 유용한 위젯
-      body: Column(children: <Widget>[
-        //메모앱 상단
-        Padding(
-            padding: EdgeInsets.only(left: 20, top: 40),
-            child: Container(
-              child: Text('메모메모',
-                  style: TextStyle(fontSize: 36, color: Colors.blue)),
-              alignment: Alignment.centerLeft,
-            )),
+    return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
+          brightness: Brightness.dark
+      ),
+      home: Scaffold(
+        //데이터를 리스트로 뿌려줄 때 유용한 위젯
+        body: Column(children: <Widget>[
+          //메모앱 상단
+          Padding(
+              padding: EdgeInsets.only(left: 20, top: 40),
+              child: Container(
+                child: Text('메모메모',
+                    style: TextStyle(fontSize: 36, color: Colors.blue)),
+                alignment: Alignment.centerLeft,
+              )),
 
-        //메모앱 리스트
-        Expanded(child: memoBuilder(context))
-      ]),
+          //메모앱 리스트
+          Expanded(child: memoBuilder(context))
+        ]),
 
-      floatingActionButton:
-          insertMemoButton(), // This trailing comma makes auto-formatting nicer for build methods.
+        floatingActionButton:
+            insertMemoButton(), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 
@@ -95,10 +100,12 @@ class _MyHomePageState extends State<MyHomePage> {
             Utility util = Utility();
 
             return Column(
+
               children: <Widget>[
                 Container(
                   height: 80,
                   child: Card(
+                    color: Colors.accents[index % Colors.accents.length],
                     child: ListTile(
                       trailing: Text(
                         util.TimeCheckAmPm(memo.editTime),
@@ -115,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           overflow: TextOverflow.ellipsis),
                       onTap: () => Navigator.push(
                           parentContext,
-                          CupertinoPageRoute(
+                          MaterialPageRoute(
                               builder: (context) => ViewPage(id: memo.id))),
                       onLongPress: () {
                         deleteId = memo.id;

@@ -19,6 +19,10 @@ class _WritePage extends State<WritePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
+          brightness: Brightness.dark
+      ),
       home: Scaffold(
         //resizeToAvoidBottomInset: true,
         appBar: AppBar(
