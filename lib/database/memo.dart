@@ -4,8 +4,9 @@ class Memo{
   final String text;
   final String createTime;
   String editTime;
+  int favorite;
 
-  Memo({this.id, this.title, this.text, this.createTime, this.editTime});
+  Memo({this.id, this.title, this.text, this.createTime, this.editTime, this.favorite});
 
   Map<String, dynamic> toMap(){
     return {
@@ -13,7 +14,8 @@ class Memo{
       'title' : title,
       'text' : text,
       'createTime' : createTime,
-      'editTime' : editTime
+      'editTime' : editTime,
+      'favorite' : favorite
     };
   }
 
@@ -21,7 +23,7 @@ class Memo{
   @override
   String toString(){
     return 'Memo {'
-        'id: $id, title: $title, text: $text, createTime: $createTime, editTime: $editTime'
+        'id: $id, title: $title, text: $text, createTime: $createTime, editTime: $editTime, favorite: $favorite'
         '}';
   }
 

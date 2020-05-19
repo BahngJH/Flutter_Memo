@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:memomemo/database/memo.dart';
 
-final String TableName = 'memos';
+final String tableName = 'memos';
 
 class DBHelper {
   var _db;
@@ -18,7 +18,7 @@ class DBHelper {
       //데이터베이스가 처음 생성될 때, dog를 저장하기 위한 테이블을 생성합니다.
       onCreate: (db, version){
         return db.execute(
-          "CREATE TABLE memos(id TEXT PRIMARY KEY, title TEXT, text TEXT, createTime TEXT, editTime TEXT)",
+          "CREATE TABLE memos(id TEXT PRIMARY KEY, title TEXT, text TEXT, createTime TEXT, editTime TEXT, favorite BOOL)",
         );
       },
     //버전을 설정하세요. onCreate 함수에서 실행되며 데이터베이스 업그레이드와 다운그레이드를
@@ -29,12 +29,12 @@ class DBHelper {
   
   Future<void> insertMemo(Memo memo) async {
     final db = await database;
-    
+    print(memo);
     //Memo를 올바른 테이블에 추가하세요. 또한
     // `conflictAlgorithm`을 명시할 것입니다. 본 예제에서는 만약 동일한 memo가 여러번 추가되면,
     //이전 데이터를 덮어쓸 것입니다.
     await db.insert(
-        TableName,
+        tableName,
         memo.toMap(),
         conflictAlgorithm:  ConflictAlgorithm.replace
     );
@@ -44,7 +44,7 @@ class DBHelper {
     final db = await database;
 
     //모든 Memo를 얻기 위해 테이블에 질의합니다.
-    final List<Map<String,dynamic>> maps = await db.query('memos', orderBy: "editTime desc", );
+    final List<Map<String,dynamic>> maps = await db.query('memos', orderBy: "favorite desc, editTime desc", );
 
     //List<Map<String, dynamic>를 List<Memo>로 변환합니다.
     return List.generate(maps.length, (i){
@@ -53,7 +53,8 @@ class DBHelper {
         title: maps[i]['title'],
         text: maps[i]['text'],
         createTime: maps[i]['createTime'],
-        editTime: maps[i]['editTime']
+        editTime: maps[i]['editTime'],
+        favorite: maps[i]['favorite']
       );
     });
   }
@@ -62,7 +63,7 @@ class DBHelper {
     final db = await database;
 
     //주어진 Memo를 수정합니다.
-    await db.update(TableName, memo.toMap(),
+    await db.update(tableName, memo.toMap(),
     //Memo의 id가 일치하는지 확인합니다.
       where: "id = ?",
       //Memo의 id를 whereArg로 넘겨 SQL injection을 방지합니다.
@@ -74,7 +75,7 @@ class DBHelper {
     final db = await database;
 
     //데이타베이스에서 Memo를 삭제
-    await db.delete(TableName,
+    await db.delete(tableName,
     where: 'id = ?',
     whereArgs: [id]);
   }
@@ -92,7 +93,8 @@ class DBHelper {
           title: maps[i]['title'],
           text: maps[i]['text'],
           createTime: maps[i]['createTime'],
-          editTime: maps[i]['editTime']
+          editTime: maps[i]['editTime'],
+          favorite: maps[i]['favorite']
       );
     });
   }

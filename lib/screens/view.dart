@@ -16,43 +16,14 @@ class ViewPage extends StatefulWidget {
 }
 
 class _ViewPageState extends State<ViewPage> {
-  Memo _memo = null;
+  Memo _memo;
+  Memo _secondMemo;
+  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-          primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
-          brightness: Brightness.dark
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () => share(context),
-            ),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                deleteMemo(_memo.id);
-                Navigator.pop(context);
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EditPage(id: widget.id)));
-              },
-            )
-          ],
-        ),
-        body: Padding(padding: EdgeInsets.all(20), child: LoadBuilder()),
-      ),
-    );
+    if (_memo != null && _secondMemo == null) _secondMemo = _memo;
+    return loadBuilder();
   }
 
   void share(BuildContext context) {
@@ -75,7 +46,7 @@ class _ViewPageState extends State<ViewPage> {
   }
 
   void showAlertDialog(BuildContext context) async {
-    String result = await showDialog(
+    await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
@@ -99,52 +70,140 @@ class _ViewPageState extends State<ViewPage> {
         });
   }
 
-  LoadBuilder() {
-
+  loadBuilder() {
     return FutureBuilder<List<Memo>>(
         future: loadMemo(widget.id),
         builder: (BuildContext context, AsyncSnapshot<List<Memo>> snapshot) {
-
           Utility util = Utility();
 
-
           if (snapshot.data == null) {
-            return Container(child: Text("데이터를 불러올 수 없습니다."));
-          } else {
+            return MaterialApp(
+                theme: ThemeData(
+                    primarySwatch: Colors.deepOrange,
+                    primaryColor: Colors.white,
+                    brightness: Brightness.dark),
+                home: Scaffold(
+                  body: Center(
+                    child: Text("불러올 데이터가 없습니다."),
+                  ),
+                ));
+          }
+          print(snapshot);
+          print(snapshot.hasData);
+          if (snapshot.hasData) {
             _memo = snapshot.data[0];
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Container(
-                  height: 70,
-                  child: SingleChildScrollView(
-                    child: Text(
-                      _memo.title,
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+            //print("DB에서 조회한 데이터 : "+_memo.favorite.toString());
+
+            return MaterialApp(
+              theme: ThemeData(
+                  primarySwatch: Colors.deepOrange,
+                  primaryColor: Colors.white,
+                  brightness: Brightness.dark),
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () => share(context),
                     ),
+                    IconButton(
+                      icon: Icon(_secondMemo == null
+                          ? _memo.favorite == 0 ? Icons.star_border : Icons.star
+                          : _secondMemo.favorite == 0
+                              ? Icons.star_border
+                              : Icons.star, color: Colors.amberAccent),
+                      onPressed: () {
+                        updateFavorite(_toggleFavorite());
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        deleteMemo(_memo.id);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditPage(id: widget.id)));
+                      },
+                    )
+                  ],
+                ),
+                body: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Container(
+                        height: 70,
+                        child: SingleChildScrollView(
+                          child: Text(
+                            _memo.title,
+                            style: TextStyle(
+                                fontSize: 30, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ),
+                      Padding(padding: EdgeInsets.all(10)),
+
+                      //긴글 텍스트 스크롤 생성하게 도와줌
+                      Expanded(
+                          flex: 1,
+                          child:
+                              SingleChildScrollView(child: Text(_memo.text))),
+                      Text(
+                        "최근 수정 시간 : " +
+                            util.timeCheckAmPm(_memo.editTime) +
+                            "\n",
+                        style: TextStyle(fontSize: 11),
+                        textAlign: TextAlign.end,
+                      ),
+                      Text(
+                        "최초 만든 시간 : " + util.timeCheckAmPm(_memo.createTime),
+                        style: TextStyle(fontSize: 11),
+                        textAlign: TextAlign.end,
+                      ),
+                    ],
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(10)),
-                
-                //긴글 텍스트 스크롤 생성하게 도와줌
-                Expanded(
-                    flex: 1,
-                    child: SingleChildScrollView(
-                        child: Text(_memo.text))),
-                Text(
-                  "최근 수정 시간 : " + util.TimeCheckAmPm(_memo.editTime)+"\n",
-                  style: TextStyle(fontSize: 11),
-                  textAlign: TextAlign.end,
-                ),
-                Text(
-                  "최초 만든 시간 : " + util.TimeCheckAmPm(_memo.createTime),
-                  style: TextStyle(fontSize: 11),
-                  textAlign: TextAlign.end,
-                ),
-              ],
+              ),
             );
           }
+          //동그란 프로그래스 바
+          return CircularProgressIndicator();
         });
+  }
+
+  int _toggleFavorite() {
+    setState(() {
+      if (_secondMemo == null && _memo.favorite == 0)
+        _memo.favorite = 1;
+      else if (_secondMemo == null && _memo.favorite == 1)
+        _memo.favorite = 0;
+      else if (_secondMemo != null && _secondMemo.favorite == 0)
+        _secondMemo.favorite = 1;
+      else if (_secondMemo != null && _secondMemo.favorite == 1)
+        _secondMemo.favorite = 0;
+    });
+    return _secondMemo == null ? _memo.favorite : _secondMemo.favorite;
+  }
+
+  void updateFavorite(int currentVal) async {
+    DBHelper sd = DBHelper();
+    var fido = Memo(
+      id: _memo.id,
+      title: _memo.title,
+      text: _memo.text,
+      createTime: _memo.createTime,
+      editTime: _memo.editTime,
+      favorite: currentVal
+    );
+
+    return await sd.updateMemo(fido);
   }
 }

@@ -15,6 +15,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   String deleteId = '';
 
   @override
@@ -25,6 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
           brightness: Brightness.dark
       ),
       home: Scaffold(
+        key: _scaffoldKey,
         //데이터를 리스트로 뿌려줄 때 유용한 위젯
         body: Column(children: <Widget>[
           //메모앱 상단
@@ -40,14 +43,21 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(child: memoBuilder(context))
         ]),
 
-        floatingActionButton:
-            insertMemoButton(), // This trailing comma makes auto-formatting nicer for build methods.
+        floatingActionButton: //InsertMemoButton(scaffoldKey : _scaffoldKey)
+        FloatingActionButton.extended(
+          onPressed: () {
+            insertMemo(context);
+          },
+          tooltip: '메모를 추가하려면 클릭하세요',
+          label: Text('메모 추가'),
+          icon: Icon(Icons.add),
+        )
       ),
     );
   }
 
   void showAlertDialog(BuildContext context) async {
-    String result = await showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
@@ -98,6 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) {
             Memo memo = snap.data[index];
             Utility util = Utility();
+            //var textColor = index > 6? Colors.black:Colors.white;
+            var textColor = Colors.white;
+            var favorite = memo.favorite == 1? Icon(Icons.star, color: Colors.amberAccent,) : null;
 
             return Column(
 
@@ -105,21 +118,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   height: 80,
                   child: Card(
-                    color: Colors.accents[index % Colors.accents.length],
+                    //color: Colors.accents[index % Colors.accents.length],
                     child: ListTile(
+                      leading: favorite,
                       trailing: Text(
-                        util.TimeCheckAmPm(memo.editTime),
-                        style: TextStyle(fontSize: 11),
+                        util.timeCheckAmPm(memo.editTime),
+                          style: TextStyle(color: textColor)
                       ),
                       title: Text(
                         memo.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: textColor)
                       ),
                       subtitle: Text(
                           memo.text,
                           maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: textColor)
+                      ),
                       onTap: () => Navigator.push(
                           parentContext,
                           MaterialPageRoute(
@@ -149,22 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
     DBHelper sd = DBHelper();
     return await sd.deleteMemo(id);
   }
-}
 
-class insertMemoButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        _insertMemo(context);
-      },
-      tooltip: '메모를 추가하려면 클릭하세요',
-      label: Text('메모 추가'),
-      icon: Icon(Icons.add),
-    );
-  }
-
-  _insertMemo(BuildContext context) async {
+  insertMemo(BuildContext context) async {
     final result = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => WritePage()));
 
@@ -176,6 +179,41 @@ class insertMemoButton extends StatelessWidget {
       ),
     );
 
-    if (result != null) Scaffold.of(context).showSnackBar(snackMsg);
+    if(result != null) _scaffoldKey.currentState.showSnackBar(snackMsg);
   }
+
 }
+
+//이렇게 구성하면 스낵바는 생성되나 저장시 List에 바로 화면이 보이지 않아 문제가 생김
+//class InsertMemoButton extends StatelessWidget {
+//  InsertMemoButton({Key key, this.scaffoldKey}) : super(key: key);
+//  final GlobalKey<ScaffoldState> scaffoldKey;
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return FloatingActionButton.extended(
+//      onPressed: () {
+//        _insertMemo(context);
+//      },
+//      tooltip: '메모를 추가하려면 클릭하세요',
+//      label: Text('메모 추가'),
+//      icon: Icon(Icons.add),
+//    );
+//  }
+//
+//  _insertMemo(BuildContext context) async {
+//    final result = await Navigator.push(
+//        context, MaterialPageRoute(builder: (context) => WritePage()));
+//
+//    var snackMsg = SnackBar(
+//      content: Text("$result"),
+//      action: SnackBarAction(
+//        label: "닫기",
+//        onPressed: () {},
+//      ),
+//    );
+//
+//    if(result != null) scaffoldKey.currentState.showSnackBar(snackMsg);
+//  }
+//}
+

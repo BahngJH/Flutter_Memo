@@ -87,11 +87,12 @@ class _WritePage extends State<WritePage> {
     DBHelper sd = DBHelper();
 
     var fido = Memo(
-      id: Str2Sha512(DateTime.now().toString()),
+      id: str2Sha512(DateTime.now().toString()),
       title: this.title,
       text: this.text,
       createTime: DateTime.now().toString(),
       editTime: DateTime.now().toString(),
+      favorite: 0
     );
 
     await sd.insertMemo(fido);
@@ -99,7 +100,7 @@ class _WritePage extends State<WritePage> {
     print(await sd.memos());
   }
 
-  String Str2Sha512(String text) {
+  String str2Sha512(String text) {
     var bytes = utf8.encode(text); // data being hashed
     var digest = sha512.convert(bytes);
 
