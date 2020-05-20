@@ -121,8 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) {
             Memo memo = snap.data[index];
             Utility util = Utility();
-            //var textColor = index > 6? Colors.black:Colors.white;
-            var textColor = Colors.white;
+            var textColor = index > 6? Colors.black:Colors.white;
             var favorite = memo.favorite == 1? Icon(Icons.star, color: Colors.amberAccent,) : null;
 
             return Column(
@@ -131,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   height: 80,
                   child: Card(
-                    //color: Colors.accents[index % Colors.accents.length],
+                    color: Colors.accents[index % Colors.accents.length][100],
                     child: ListTile(
                       leading: favorite,
                       trailing: Text(
