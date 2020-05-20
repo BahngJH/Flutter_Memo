@@ -5,6 +5,9 @@ import 'package:memomemo/database/memo.dart';
 import 'package:memomemo/database/db.dart';
 import 'view.dart';
 import 'utility.dart';
+import 'package:firebase_admob/firebase_admob.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:io' show Platform;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -14,20 +17,28 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+final String appIdForAndroid = "ca-app-pub-9884776427076155~8953597184";
+final String appIdForIOS = "ca-app-pub-9884776427076155~9897646218";
+final String adUnitForAndroid = "ca-app-pub-9884776427076155/2004017785";
+final String adUnitForIOS = "ca-app-pub-9884776427076155/3332237864";
+
 class _MyHomePageState extends State<MyHomePage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  //final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   String deleteId = '';
 
   @override
   Widget build(BuildContext context) {
+    FirebaseAdMob.instance.initialize(appId: Platform.isAndroid ? appIdForAndroid : appIdForIOS);
+    googleAdMob();
+
     return MaterialApp(
       theme: ThemeData(
           primarySwatch: Colors.deepOrange, primaryColor: Colors.white,
           brightness: Brightness.dark
       ),
       home: Scaffold(
-        key: _scaffoldKey,
+        //key: _scaffoldKey,
         //데이터를 리스트로 뿌려줄 때 유용한 위젯
         body: Column(children: <Widget>[
           //메모앱 상단
@@ -43,14 +54,16 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(child: memoBuilder(context))
         ]),
 
-        floatingActionButton: //InsertMemoButton(scaffoldKey : _scaffoldKey)
-        FloatingActionButton.extended(
-          onPressed: () {
-            insertMemo(context);
-          },
-          tooltip: '메모를 추가하려면 클릭하세요',
-          label: Text('메모 추가'),
-          icon: Icon(Icons.add),
+        floatingActionButton: Container(
+          margin: EdgeInsets.only(bottom: 40),
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              insertMemo(context);
+            },
+            tooltip: '메모를 추가하려면 클릭하세요',
+            label: Text('메모 추가'),
+            icon: Icon(Icons.add),
+          ),
         )
       ),
     );
@@ -157,6 +170,65 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  insertMemo(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => WritePage()));
+
+    showToast(result);
+//    var snackMsg = SnackBar(
+//      content: Text("$result"),
+//      action: SnackBarAction(
+//        label: "닫기",
+//        onPressed: () {},
+//      ),
+//    );
+
+    //if(result != null) _scaffoldKey.currentState.showSnackBar(snackMsg);
+  }
+
+  //Toast 구현
+  void showToast(String msg){
+    Fluttertoast.showToast(
+        fontSize: 18.0,
+        msg: msg,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER
+    );
+  }
+
+  //앱 광고를 위한 에드몹
+  void googleAdMob() {
+    MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+      keywords: <String>['note', 'memo'],
+      contentUrl: 'https://flutter.io',
+      childDirected: false,
+      testDevices: <String>[], // Android emulators are considered test devices
+    );
+
+    BannerAd myBanner = BannerAd(
+      //adUnitId: Platform.isAndroid? adUnitForAndroid : adUnitForIOS,
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event is $event");
+      },
+    );
+
+    myBanner
+    // typically this happens well before the ad is shown
+      ..load()
+      ..show(
+        // Positions the banner ad 60 pixels from the bottom of the screen
+        anchorOffset: 0.0,
+        // Positions the banner ad 10 pixels from the center of the screen to the right
+        // Banner Position
+        anchorType: AnchorType.bottom,
+      );
+  }
+
   Future<List<Memo>> loadMemo() async {
     DBHelper sd = DBHelper();
     return await sd.memos();
@@ -165,21 +237,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> deleteMemo(String id) async {
     DBHelper sd = DBHelper();
     return await sd.deleteMemo(id);
-  }
-
-  insertMemo(BuildContext context) async {
-    final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => WritePage()));
-
-    var snackMsg = SnackBar(
-      content: Text("$result"),
-      action: SnackBarAction(
-        label: "닫기",
-        onPressed: () {},
-      ),
-    );
-
-    if(result != null) _scaffoldKey.currentState.showSnackBar(snackMsg);
   }
 
 }

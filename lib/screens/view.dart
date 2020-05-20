@@ -18,7 +18,6 @@ class ViewPage extends StatefulWidget {
 class _ViewPageState extends State<ViewPage> {
   Memo _memo;
   Memo _secondMemo;
-  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
@@ -163,10 +162,13 @@ class _ViewPageState extends State<ViewPage> {
                         style: TextStyle(fontSize: 11),
                         textAlign: TextAlign.end,
                       ),
-                      Text(
-                        "최초 만든 시간 : " + util.timeCheckAmPm(_memo.createTime),
-                        style: TextStyle(fontSize: 11),
-                        textAlign: TextAlign.end,
+                      Container(
+                        margin: EdgeInsets.only(bottom: 40),
+                        child: Text(
+                          "최초 만든 시간 : " + util.timeCheckAmPm(_memo.createTime),
+                          style: TextStyle(fontSize: 11),
+                          textAlign: TextAlign.end,
+                        ),
                       ),
                     ],
                   ),

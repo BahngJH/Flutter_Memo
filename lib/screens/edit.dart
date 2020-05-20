@@ -16,6 +16,7 @@ class _EditPageState extends State<EditPage> {
   String title = '';
   String text = '';
   String createTime = '';
+  int favorite;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,7 @@ class _EditPageState extends State<EditPage> {
           tecText.text = text;
 
           createTime = memo.createTime;
+          favorite = memo.favorite;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -119,6 +121,7 @@ class _EditPageState extends State<EditPage> {
       text: this.text,
       createTime: this.createTime,
       editTime: DateTime.now().toString(),
+      favorite: favorite
     );
 
     sd.updateMemo(fido);
